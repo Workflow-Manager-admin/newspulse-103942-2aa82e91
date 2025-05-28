@@ -1,0 +1,13 @@
+.news-feed {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 22px;
+  margin-bottom: 40px;
+}
+
+.empty-feed-msg {
+  color: var(--text-secondary);
+  text-align: center;
+  font-size: 1.12rem;
+  margin: 22px 0;
+}
