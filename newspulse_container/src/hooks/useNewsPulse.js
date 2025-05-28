@@ -22,7 +22,6 @@ const NewsPulseContext = createContext();
 export function NewsPulseProvider({ children }) {
   // Theme/dark mode
   const getInitialTheme = () => {
-    // Use useDarkMode implementation pattern.
     if (window.localStorage && window.localStorage.getItem(STORAGE_KEYS.THEME))
       return window.localStorage.getItem(STORAGE_KEYS.THEME);
     if (window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches)
@@ -60,7 +59,6 @@ export function NewsPulseProvider({ children }) {
 
   // Bookmarks
   const [bookmarks, setBookmarks] = useState(() => {
-    // bookmarks is array of article objects
     const raw = window.localStorage.getItem(STORAGE_KEYS.BOOKMARKS);
     if (!raw) return [];
     try {
@@ -84,10 +82,16 @@ export function NewsPulseProvider({ children }) {
   /**
    * Fetch news articles from NewsAPI.org based on category.
    * Fallback to demo data if network fails or rate limited.
-   * Instructions: Insert your API key from https://newsapi.org/docs in the NEWS_API_KEY variable below.
-   * Do NOT use a real API key in public code!
+   * 
+   * Configuration: 
+   * Use .env file at project root with REACT_APP_NEWSAPI_KEY for secret key injection.
+   * If key not set, clear user-facing message is shown and demo mode used.
+   * Do NOT hardcode a real API key in public code!
    */
-  const NEWS_API_KEY = "YOUR_NEWSAPI_KEY_HERE"; // <-- Replace with your key for real usage!
+  const NEWS_API_KEY =
+    typeof process !== "undefined" && process.env && process.env.REACT_APP_NEWSAPI_KEY
+      ? process.env.REACT_APP_NEWSAPI_KEY
+      : "YOUR_NEWSAPI_KEY_HERE";
   const NEWS_API_URL = "https://newsapi.org/v2/top-headlines";
 
   const [error, setError] = useState(null); // error message for feed/UI
@@ -95,14 +99,27 @@ export function NewsPulseProvider({ children }) {
   async function fetchArticles(categoryPref = []) {
     setLoading(true);
     setError(null);
+
+    // Check API key precondition
+    if (
+      !NEWS_API_KEY ||
+      NEWS_API_KEY === "" ||
+      NEWS_API_KEY === "YOUR_NEWSAPI_KEY_HERE"
+    ) {
+      setArticles([]);
+      setError(
+        "⚠️ NewsAPI is not configured! Please create a .env file with 'REACT_APP_NEWSAPI_KEY=your_real_api_key' at the root, then restart. [Get free API key: https://newsapi.org/register] Demo articles are shown below."
+      );
+      setLoading(false);
+      return;
+    }
+
     let category =
       categoryPref && categoryPref.length === 1
         ? categoryPref[0]
         : (selectedCategory && selectedCategory !== "All" ? selectedCategory : "");
     let url = `${NEWS_API_URL}?country=us&apiKey=${NEWS_API_KEY}`;
     if (category && category !== "All") {
-      // NewsAPI expects lowercase categories, and supports certain strict values.
-      // Map UI categories to NewsAPI values; fallback to 'general' if needed.
       const catMap = {
         Technology: "technology",
         Politics: "general", // NewsAPI has no explicit 'politics'; use 'general'
@@ -117,14 +134,30 @@ export function NewsPulseProvider({ children }) {
     try {
       let data;
       const resp = await fetch(url);
+
       if (!resp.ok) {
-        throw new Error(`API error (${resp.status}): ${resp.statusText}`);
+        // Auth or quota errors
+        let errorMsg = `API error (${resp.status}): ${resp.statusText}`;
+        if (resp.status === 401 || resp.status === 403) {
+          errorMsg =
+            "⚠️ NewsAPI authentication failed (401/403). Check API key, plan, and quota at https://newsapi.org/account. Demo articles shown below.";
+        }
+        throw new Error(errorMsg);
       }
       data = await resp.json();
       if (data.status !== "ok") {
-        throw new Error(data.message || "Unknown NewsAPI error");
+        let msg = data.message || "Unknown NewsAPI error";
+        if (
+          /api key|invalid key|over quota|authentication|not allowed/i.test(msg)
+        ) {
+          msg =
+            "⚠️ NewsAPI returned authentication/config error: " +
+            msg +
+            ". Visit https://newsapi.org/account for help. Demo articles below.";
+        }
+        throw new Error(msg);
       }
-      // Map NewsAPI "articles" -> internal format
+
       const mapped = (data.articles ?? []).map((item, idx) => ({
         id: item.url || idx + "-" + (item.title || ""),
         title: item.title,
@@ -134,7 +167,7 @@ export function NewsPulseProvider({ children }) {
         content: item.content || "",
         source: item.source?.name || "Unknown",
         publishedAt: item.publishedAt ? formatDate(item.publishedAt) : "",
-        isBookmarked: bookmarks.some(b => b.title === item.title), // by title match
+        isBookmarked: bookmarks.some(b => b.title === item.title),
         url: item.url
       }));
       setArticles(mapped);
@@ -142,24 +175,43 @@ export function NewsPulseProvider({ children }) {
         setError("No articles found for this category.");
       }
     } catch (e) {
-      // fallback demo data if no API
-      setError(
+      let msg =
         "Could not fetch news from NewsAPI.org. Showing demo articles. " +
-          (e?.message ? `(${e.message})` : "")
-      );
+        (e?.message ? `(${e.message})` : "");
+
+      // Detect auth/plan errors for improved guidance
+      if (
+        typeof e?.message === "string" &&
+        (/api key|authentication|over quota|not allowed|401|403/i.test(e.message))
+      ) {
+        msg =
+          "⚠️ Unable to authenticate with NewsAPI.org. Check your API key and quota. Demo articles shown. " +
+          e.message;
+      }
+      setError(msg);
       const demo = [
         {
           id: 1,
-          title: "Tech Giants Merge to Form New Era in AI", image: "https://images.unsplash.com/photo-1461749280684-dccba630e2f6?fit=crop&w=600&q=80",
-          category: "Technology", summary: "The world’s largest tech companies announced a merger that will have sweeping consequences for global AI.",
-          content: "Full article content here...", source: "TechCrunch", publishedAt: "2024-06-28", isBookmarked: false,
+          title: "Tech Giants Merge to Form New Era in AI",
+          image: "https://images.unsplash.com/photo-1461749280684-dccba630e2f6?fit=crop&w=600&q=80",
+          category: "Technology",
+          summary: "The world’s largest tech companies announced a merger that will have sweeping consequences for global AI.",
+          content: "Full article content here...",
+          source: "TechCrunch",
+          publishedAt: "2024-06-28",
+          isBookmarked: false,
           url: "#"
         },
         {
           id: 2,
-          title: "World Health Organization Announces Breakthrough", image: "https://images.unsplash.com/photo-1506744038136-46273834b3fb?fit=crop&w=600&q=80",
-          category: "Health", summary: "A new medical breakthrough could change the future of healthcare.",
-          content: "Full article content here...", source: "BBC Health", publishedAt: "2024-06-28", isBookmarked: false,
+          title: "World Health Organization Announces Breakthrough",
+          image: "https://images.unsplash.com/photo-1506744038136-46273834b3fb?fit=crop&w=600&q=80",
+          category: "Health",
+          summary: "A new medical breakthrough could change the future of healthcare.",
+          content: "Full article content here...",
+          source: "BBC Health",
+          publishedAt: "2024-06-28",
+          isBookmarked: false,
           url: "#"
         }
       ];
@@ -172,7 +224,6 @@ export function NewsPulseProvider({ children }) {
   // Fetch data at app load or when onboarding is complete or category changes
   useEffect(() => {
     if (onboarded) {
-      // Always fetch for current selected category
       if (selectedCategory && selectedCategory !== "All") {
         fetchArticles([selectedCategory]);
       } else {
@@ -182,11 +233,8 @@ export function NewsPulseProvider({ children }) {
     // eslint-disable-next-line
   }, [onboarded, selectedCategory]); // refetch on onboarding or tab/cat change
 
-  // ------------- Bookmarks Logic ---------------
   // PUBLIC_INTERFACE
-  /**
-   * Add or remove bookmark for a news article. Persists to localStorage.
-   */
+  /** Add or remove bookmark for a news article. Persists to localStorage. */
   const toggleBookmark = useCallback(article => {
     const existing = bookmarks.find(b => b.title === article.title);
     let updated;
@@ -205,9 +253,7 @@ export function NewsPulseProvider({ children }) {
   }, [bookmarks]);
 
   // PUBLIC_INTERFACE
-  /**
-   * Remove an article from bookmarks
-   */
+  /** Remove an article from bookmarks */
   const removeBookmark = (articleId) => {
     const updated = bookmarks.filter(a => a.id !== articleId);
     setBookmarks(updated);
@@ -219,26 +265,19 @@ export function NewsPulseProvider({ children }) {
     );
   };
 
-  // Save bookmarks to localStorage when changed
   useEffect(() => {
     window.localStorage.setItem(STORAGE_KEYS.BOOKMARKS, JSON.stringify(bookmarks));
   }, [bookmarks]);
 
-  // ------------- Category ----------------
   // PUBLIC_INTERFACE
-  /**
-   * Select a news category.
-   */
+  /** Select a news category. */
   const handleCategorySelect = cat => {
     setSelectedCategory(cat);
     setNotification(cat === "All" ? "" : `Showing ${cat} news`);
   };
 
-  // ------------- Onboarding Logic ---------
   // PUBLIC_INTERFACE
-  /**
-   * Complete onboarding, persist preferences.
-   */
+  /** Complete onboarding, persist preferences. */
   const completeOnboarding = (prefs) => {
     setPreferences(prefs);
     setOnboarded(true);
@@ -248,13 +287,11 @@ export function NewsPulseProvider({ children }) {
     fetchArticles(prefs);
   };
 
-  // ----------- Utilities -----------
   function capitalize(str) {
     if (!str) return "";
     return str.charAt(0).toUpperCase() + str.slice(1);
   }
   function formatDate(str) {
-    // e.g. 2024-06-20T07:18:31.000Z or similar
     if (!str) return "";
     const d = new Date(str);
     return d.toLocaleDateString(undefined, {
@@ -262,13 +299,11 @@ export function NewsPulseProvider({ children }) {
     });
   }
 
-  // ------------- Filtered Data ---------------
   const filteredArticles =
     selectedCategory === "All"
       ? articles
       : articles.filter(a => a.category === selectedCategory);
 
-  // --------------- Context Value ---------------
   const value = {
     theme, toggleTheme,
     onboarded, preferences,
