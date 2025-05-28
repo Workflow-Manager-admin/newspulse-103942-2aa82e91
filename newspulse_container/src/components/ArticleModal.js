@@ -39,11 +39,10 @@ export default function ArticleModal({ article, categories, onClose, onBookmark 
         </div>
         <img src={article.image} alt={article.title} className="modal-article-img" />
         <div className="modal-content">
-          {article.summary && (
-            <div className="ai-summary">
-              <span className="ai-label">AI Summary:</span> {article.summary}
-            </div>
-          )}
+          <div className="ai-summary">
+            <span className="ai-label">AI Summary:</span>{" "}
+            {generateSummary(article.summary || article.content || article.title)}
+          </div>
           <div className="article-full">{article.content}</div>
         </div>
       </div>
