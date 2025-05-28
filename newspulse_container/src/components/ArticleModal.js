@@ -1,6 +1,7 @@
 import React from "react";
 import PropTypes from "prop-types";
 import "./ArticleModal.css";
+import { generateSummary } from "../utils/generateSummary";
 
 // PUBLIC_INTERFACE
 /**
