@@ -1,0 +1,36 @@
+.notification {
+  position: fixed;
+  top: 78px;
+  left: 0;
+  width: 100vw;
+  z-index: 1505;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  pointer-events: none;
+}
+.notification > span {
+  background: var(--accent);
+  color: #fff;
+  padding: 10px 34px 10px 22px;
+  border-radius: 32px;
+  font-size: 1rem;
+  font-weight: 500;
+  box-shadow: 0 2px 22px 0 rgba(20,20,20,0.09);
+  pointer-events: all;
+}
+.notif-dismiss {
+  background: none;
+  border: none;
+  color: var(--text-color);
+  font-size: 1.2rem;
+  margin-left: -24px;
+  margin-right: 16px;
+  cursor: pointer;
+  pointer-events: all;
+}
+.notif-dismiss:focus,
+.notif-dismiss:hover {
+  color: var(--secondary);
+  text-shadow: 0 0 2px #fff;
+}
