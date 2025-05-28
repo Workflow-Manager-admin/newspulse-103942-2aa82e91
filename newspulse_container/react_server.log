@@ -149,3 +149,38 @@ ERROR in ./src/components/NewsFeed.js 7:0-24
 Module not found: Error: Can't resolve './NewsFeed.css' in '/home/kavia/workspace/code-generation/newspulse-103942-2aa82e91/newspulse_container/src/components'
 
 webpack compiled with 10 errors
+Compiling...
+Failed to compile.
+
+Module not found: Error: Can't resolve './components/ArticleModal' in '/home/kavia/workspace/code-generation/newspulse-103942-2aa82e91/newspulse_container/src'
+ERROR in ./src/App.js 10:0-53
+Module not found: Error: Can't resolve './components/ArticleModal' in '/home/kavia/workspace/code-generation/newspulse-103942-2aa82e91/newspulse_container/src'
+
+ERROR in ./src/App.js 11:0-59
+Module not found: Error: Can't resolve './components/BookmarkSection' in '/home/kavia/workspace/code-generation/newspulse-103942-2aa82e91/newspulse_container/src'
+
+ERROR in ./src/App.js 12:0-49
+Module not found: Error: Can't resolve './components/Onboarding' in '/home/kavia/workspace/code-generation/newspulse-103942-2aa82e91/newspulse_container/src'
+
+ERROR in ./src/App.js 13:0-53
+Module not found: Error: Can't resolve './components/Notification' in '/home/kavia/workspace/code-generation/newspulse-103942-2aa82e91/newspulse_container/src'
+
+ERROR in ./src/App.js 14:0-51
+Module not found: Error: Can't resolve './components/ThemeToggle' in '/home/kavia/workspace/code-generation/newspulse-103942-2aa82e91/newspulse_container/src'
+
+ERROR in ./src/App.js 15:0-46
+Module not found: Error: Can't resolve './hooks/useDarkMode' in '/home/kavia/workspace/code-generation/newspulse-103942-2aa82e91/newspulse_container/src'
+
+ERROR in ./src/components/CategoryFilter.js 6:0-30
+Module not found: Error: Can't resolve './CategoryFilter.css' in '/home/kavia/workspace/code-generation/newspulse-103942-2aa82e91/newspulse_container/src/components'
+
+ERROR in ./src/components/Navbar.js 6:0-22
+Module not found: Error: Can't resolve './Navbar.css' in '/home/kavia/workspace/code-generation/newspulse-103942-2aa82e91/newspulse_container/src/components'
+
+ERROR in ./src/components/NewsCard.js 6:0-24
+Module not found: Error: Can't resolve './NewsCard.css' in '/home/kavia/workspace/code-generation/newspulse-103942-2aa82e91/newspulse_container/src/components'
+
+ERROR in ./src/components/NewsFeed.js 7:0-24
+Module not found: Error: Can't resolve './NewsFeed.css' in '/home/kavia/workspace/code-generation/newspulse-103942-2aa82e91/newspulse_container/src/components'
+
+webpack compiled with 10 errors
