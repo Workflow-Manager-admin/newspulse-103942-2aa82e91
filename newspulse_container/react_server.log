@@ -217,3 +217,4 @@ src/App.js
   Line 17:7:  Parsing error: Identifier 'React' has already been declared. (17:7)
 
 webpack compiled with 2 errors
+Compiling...

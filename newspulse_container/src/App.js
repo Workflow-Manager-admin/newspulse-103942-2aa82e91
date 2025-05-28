@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import './App.css';
 
 // Import NewsPulse Provider and hook
@@ -13,10 +13,6 @@ import BookmarkSection from './components/BookmarkSection';
 import Onboarding from './components/Onboarding';
 import Notification from './components/Notification';
 import ThemeToggle from './components/ThemeToggle';
-
-import React, { useState } from 'react';
-// ...rest imports...
-
 import NotificationSettingsModal from './components/NotificationSettingsModal';
 
 // App-level wiring using NewsPulseProvider and context
@@ -74,7 +70,6 @@ function AppContent() {
 
   // Simulate "request" for push notification permissions
   const handleRequestPushPermission = () => {
-    // Simulate prompt/permission granted
     setNotification("Push notifications enabled! (simulation)");
     setNotifModalOpen(false);
   };
