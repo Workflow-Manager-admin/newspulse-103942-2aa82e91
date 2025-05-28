@@ -1,6 +1,10 @@
-import React, { useState } from 'react';
+import React from 'react';
 import './App.css';
 
+// Import NewsPulse Provider and hook
+import { NewsPulseProvider, useNewsPulse } from './hooks/useNewsPulse';
+
+// UI components
 import Navbar from './components/Navbar';
 import CategoryFilter from './components/CategoryFilter';
 import NewsFeed from './components/NewsFeed';
@@ -10,94 +14,28 @@ import Onboarding from './components/Onboarding';
 import Notification from './components/Notification';
 import ThemeToggle from './components/ThemeToggle';
 
-import useDarkMode from './hooks/useDarkMode';
+// App-level wiring using NewsPulseProvider and context
+function AppContent() {
+  const {
+    theme, toggleTheme,
+    onboarded, preferences, completeOnboarding,
+    selectedCategory, setSelectedCategory,
+    categories, filteredArticles, articles,
+    bookmarks, toggleBookmark, removeBookmark, bookmarksOpen, setBookmarksOpen,
+    notification, setNotification,
+    modalArticle, setModalArticle,
+    loading
+  } = useNewsPulse();
 
-// Dummy initial data to showcase components (would be replaced by API)
-const initialArticles = [
-  {
-    id: 1,
-    title: 'Tech Giants Merge to Form New Era in AI',
-    image: 'https://images.unsplash.com/photo-1461749280684-dccba630e2f6?fit=crop&w=600&q=80',
-    category: 'Technology',
-    summary: 'The world’s largest tech companies announced a merger that will have sweeping consequences for global AI.',
-    content: 'Full article content here...',
-    source: 'TechCrunch',
-    publishedAt: '2024-06-28',
-    isBookmarked: false
-  },
-  {
-    id: 2,
-    title: 'World Health Organization Announces Breakthrough',
-    image: 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?fit=crop&w=600&q=80',
-    category: 'Health',
-    summary: 'A new medical breakthrough could change the future of healthcare.',
-    content: 'Full article content here...',
-    source: 'BBC Health',
-    publishedAt: '2024-06-28',
-    isBookmarked: false
-  },
-  // Add more sample articles as needed
-];
-
-const categories = [
-  { name: 'Technology', icon: '💻', colorVar: 'tech' },
-  { name: 'Politics', icon: '🗳️', colorVar: 'politics' },
-  { name: 'Health', icon: '🩺', colorVar: 'health' },
-  { name: 'Sports', icon: '🏆', colorVar: 'sports' },
-  { name: 'Entertainment', icon: '🎬', colorVar: 'entertainment' },
-];
-
-function App() {
-  // Theme and dark mode
-  const [theme, toggleTheme] = useDarkMode();
-
-  // News state
-  const [selectedCategory, setSelectedCategory] = useState('All');
-  const [articles, setArticles] = useState(initialArticles);
-  const [modalArticle, setModalArticle] = useState(null);
-  const [bookmarksOpen, setBookmarksOpen] = useState(false);
-  const [notification, setNotification] = useState('');
-  const [onboardingVisible, setOnboardingVisible] = useState(false);
-
-  // Onboarding (simulate first run for demo)
-  React.useEffect(() => {
-    if (window.localStorage && !window.localStorage.getItem('hasVisited')) {
-      setOnboardingVisible(true);
-    }
-  }, []);
-
-  const handleCategorySelect = (cat) => {
-    setSelectedCategory(cat);
-    setNotification(cat === 'All' ? '' : `Showing ${cat} news`);
-  };
-
+  // Handlers
   const handleOpenArticle = (article) => setModalArticle(article);
-
   const handleCloseModal = () => setModalArticle(null);
-
-  const handleBookmark = (articleId) => {
-    setArticles(prev =>
-      prev.map(article =>
-        article.id === articleId ? { ...article, isBookmarked: !article.isBookmarked } : article
-      )
-    );
+  const handleBookmarkClick = (articleId) => {
+    // Find article
+    const article = articles.find(a => a.id === articleId);
+    if (article) toggleBookmark(article);
   };
-
   const handleToggleBookmarks = () => setBookmarksOpen(b => !b);
-
-  const handleOnboardingComplete = (prefs) => {
-    setSelectedCategory(prefs.length > 0 ? prefs[0] : 'All');
-    setOnboardingVisible(false);
-    window.localStorage.setItem('hasVisited', 'true');
-  };
-
-  // Filter articles for feed and bookmarks
-  const filteredArticles =
-    selectedCategory === 'All'
-      ? articles
-      : articles.filter((a) => a.category === selectedCategory);
-
-  const bookmarkedArticles = articles.filter((a) => a.isBookmarked);
 
   return (
     <div className={`app ${theme}`}>
@@ -110,7 +48,7 @@ function App() {
           <CategoryFilter
             categories={categories}
             selected={selectedCategory}
-            onSelect={handleCategorySelect}
+            onSelect={setSelectedCategory}
           />
           {notification && (
             <Notification message={notification} onClose={() => setNotification('')} />
@@ -118,7 +56,7 @@ function App() {
           <NewsFeed
             articles={filteredArticles}
             onOpenArticle={handleOpenArticle}
-            onBookmark={handleBookmark}
+            onBookmark={handleBookmarkClick}
             categories={categories}
           />
         </div>
@@ -127,19 +65,31 @@ function App() {
         article={modalArticle}
         categories={categories}
         onClose={handleCloseModal}
-        onBookmark={handleBookmark}
+        onBookmark={handleBookmarkClick}
       />
       <BookmarkSection
         open={bookmarksOpen}
-        articles={bookmarkedArticles}
+        articles={bookmarks}
         onClose={handleToggleBookmarks}
         onOpenArticle={handleOpenArticle}
         categories={categories}
       />
-      {onboardingVisible && (
-        <Onboarding categories={categories} onComplete={handleOnboardingComplete} />
+      {!onboarded && (
+        <Onboarding categories={categories} onComplete={completeOnboarding} />
       )}
     </div>
+  );
+}
+
+// PUBLIC_INTERFACE
+/**
+ * App root wrapped with NewsPulseProvider.
+ */
+function App() {
+  return (
+    <NewsPulseProvider>
+      <AppContent />
+    </NewsPulseProvider>
   );
 }
 
