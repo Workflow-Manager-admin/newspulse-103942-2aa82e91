@@ -2,9 +2,9 @@
 > react-kavia@0.1.0 start
 > react-scripts start
 
-(node:565) [DEP_WEBPACK_DEV_SERVER_ON_AFTER_SETUP_MIDDLEWARE] DeprecationWarning: 'onAfterSetupMiddleware' option is deprecated. Please use the 'setupMiddlewares' option.
+(node:1088) [DEP_WEBPACK_DEV_SERVER_ON_AFTER_SETUP_MIDDLEWARE] DeprecationWarning: 'onAfterSetupMiddleware' option is deprecated. Please use the 'setupMiddlewares' option.
 (Use `node --trace-deprecation ...` to show where the warning was created)
-(node:565) [DEP_WEBPACK_DEV_SERVER_ON_BEFORE_SETUP_MIDDLEWARE] DeprecationWarning: 'onBeforeSetupMiddleware' option is deprecated. Please use the 'setupMiddlewares' option.
+(node:1088) [DEP_WEBPACK_DEV_SERVER_ON_BEFORE_SETUP_MIDDLEWARE] DeprecationWarning: 'onBeforeSetupMiddleware' option is deprecated. Please use the 'setupMiddlewares' option.
 Starting the development server...
 
 Compiled successfully!
@@ -19,5 +19,35 @@ To create a production build, use npm run build.
 
 webpack compiled successfully
 Compiling...
-Compiled successfully!
-webpack compiled successfully
+Failed to compile.
+
+Module not found: Error: Can't resolve './components/Navbar' in '/home/kavia/workspace/code-generation/newspulse-103942-2aa82e91/newspulse_container/src'
+ERROR in ./src/App.js 7:0-41
+Module not found: Error: Can't resolve './components/Navbar' in '/home/kavia/workspace/code-generation/newspulse-103942-2aa82e91/newspulse_container/src'
+
+ERROR in ./src/App.js 8:0-57
+Module not found: Error: Can't resolve './components/CategoryFilter' in '/home/kavia/workspace/code-generation/newspulse-103942-2aa82e91/newspulse_container/src'
+
+ERROR in ./src/App.js 9:0-45
+Module not found: Error: Can't resolve './components/NewsFeed' in '/home/kavia/workspace/code-generation/newspulse-103942-2aa82e91/newspulse_container/src'
+
+ERROR in ./src/App.js 10:0-53
+Module not found: Error: Can't resolve './components/ArticleModal' in '/home/kavia/workspace/code-generation/newspulse-103942-2aa82e91/newspulse_container/src'
+
+ERROR in ./src/App.js 11:0-59
+Module not found: Error: Can't resolve './components/BookmarkSection' in '/home/kavia/workspace/code-generation/newspulse-103942-2aa82e91/newspulse_container/src'
+
+ERROR in ./src/App.js 12:0-49
+Module not found: Error: Can't resolve './components/Onboarding' in '/home/kavia/workspace/code-generation/newspulse-103942-2aa82e91/newspulse_container/src'
+
+ERROR in ./src/App.js 13:0-53
+Module not found: Error: Can't resolve './components/Notification' in '/home/kavia/workspace/code-generation/newspulse-103942-2aa82e91/newspulse_container/src'
+
+ERROR in ./src/App.js 14:0-51
+Module not found: Error: Can't resolve './components/ThemeToggle' in '/home/kavia/workspace/code-generation/newspulse-103942-2aa82e91/newspulse_container/src'
+
+ERROR in ./src/App.js 15:0-46
+Module not found: Error: Can't resolve './hooks/useDarkMode' in '/home/kavia/workspace/code-generation/newspulse-103942-2aa82e91/newspulse_container/src'
+
+webpack compiled with 9 errors
+Compiling...
