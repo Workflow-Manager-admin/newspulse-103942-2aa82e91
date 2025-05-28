@@ -11,3 +11,76 @@
   font-size: 1.12rem;
   margin: 22px 0;
 }
+
+/* Shimmer card for loading state */
+.card-shimmer {
+  background: var(--card-bg);
+  border-radius: 14px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 2px 16px 0 rgba(20,20,20,0.10);
+  min-height: 295px;
+  border: 1.5px solid var(--border-color);
+  padding: 0;
+  position: relative;
+  margin: 0;
+}
+.shimmer-img {
+  width: 100%;
+  aspect-ratio: 16/9;
+  background: #22252c;
+  position: relative;
+  overflow: hidden;
+}
+.shimmer-line {
+  height: 12px;
+  border-radius: 5px;
+  margin: 16px 18px 10px 16px;
+  background: #23262b;
+  position: relative;
+  overflow: hidden;
+}
+.shimmer-title {
+  width: 72%;
+  height: 19px;
+  margin-bottom: 11px;
+}
+.shimmer-meta {
+  width: 44%;
+  height: 14px;
+  margin-bottom: 8px;
+}
+.shimmer-desc {
+  width: 91%;
+  margin-bottom: 9px;
+}
+.shimmer-desc.short {
+  width: 63%;
+  margin-bottom: 17px;
+}
+
+.card-shimmer,
+.shimmer-img,
+.shimmer-line {
+  animation: shimmer 1.35s linear infinite;
+  background: linear-gradient(90deg, #22252c 8%, #2e3340 50%, #1a1a1a 92%);
+  background-size: 400% 100%;
+}
+@keyframes shimmer {
+  to {
+    background-position: 350% 0;
+  }
+}
+
+.feed-error-msg {
+  color: #eb5656;
+  background: rgba(216, 41, 76, 0.08);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: 22px 18px;
+  margin: 1.6em auto 1.5em auto;
+  max-width: 90vw;
+  font-size: 1.14rem;
+  text-align: center;
+}
