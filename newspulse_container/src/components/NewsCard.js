@@ -26,6 +26,20 @@ export default function NewsCard({ article, onClick, onBookmark, categories }) {
           <span className="news-source">{article.source}</span>
           <span className="news-date">{article.publishedAt}</span>
         </div>
+        {article.summary && (
+          <div className="news-desc">{article.summary.length > 150 ? article.summary.slice(0, 150) + "…" : article.summary}</div>
+        )}
+        {article.url && article.url !== "#" && (
+          <a
+            className="news-link"
+            href={article.url}
+            target="_blank"
+            rel="noopener noreferrer"
+            onClick={e => e.stopPropagation()}
+          >
+            Read full story<span aria-hidden> →</span>
+          </a>
+        )}
       </div>
       <button
         className={`bookmark-btn${article.isBookmarked ? " active" : ""}`}
