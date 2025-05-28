@@ -1,0 +1,25 @@
+.navbar-flex {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.navbar-actions {
+  display: flex;
+  gap: 14px;
+  align-items: center;
+}
+.icon-btn {
+  background: none;
+  border: none;
+  color: var(--text-color);
+  font-size: 1.25rem;
+  padding: 6px 10px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background 0.16s;
+}
+.icon-btn:focus,
+.icon-btn:hover {
+  background: var(--border-color);
+  outline: 2px solid var(--accent);
+}
