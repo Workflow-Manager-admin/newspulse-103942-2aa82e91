@@ -82,62 +82,105 @@ export function NewsPulseProvider({ children }) {
   // ----------- Data Fetching --------------
   // PUBLIC_INTERFACE
   /**
-   * Fetch news articles from a mock/public API.
-   * Fallback to mock data if no network access.
-   * Only fetch once per load (refresh to force again).
+   * Fetch news articles from NewsAPI.org based on category.
+   * Fallback to demo data if network fails or rate limited.
+   * Instructions: Insert your API key from https://newsapi.org/docs in the NEWS_API_KEY variable below.
+   * Do NOT use a real API key in public code!
    */
+  const NEWS_API_KEY = "YOUR_NEWSAPI_KEY_HERE"; // <-- Replace with your key for real usage!
+  const NEWS_API_URL = "https://newsapi.org/v2/top-headlines";
+
+  const [error, setError] = useState(null); // error message for feed/UI
+
   async function fetchArticles(categoryPref = []) {
     setLoading(true);
-    let url =
-      "https://inshortsapi.vercel.app/news?category=" +
-      ((categoryPref && categoryPref.length === 1) ? categoryPref[0].toLowerCase() : "all");
+    setError(null);
+    let category =
+      categoryPref && categoryPref.length === 1
+        ? categoryPref[0]
+        : (selectedCategory && selectedCategory !== "All" ? selectedCategory : "");
+    let url = `${NEWS_API_URL}?country=us&apiKey=${NEWS_API_KEY}`;
+    if (category && category !== "All") {
+      // NewsAPI expects lowercase categories, and supports certain strict values.
+      // Map UI categories to NewsAPI values; fallback to 'general' if needed.
+      const catMap = {
+        Technology: "technology",
+        Politics: "general", // NewsAPI has no explicit 'politics'; use 'general'
+        Health: "health",
+        Sports: "sports",
+        Entertainment: "entertainment",
+      };
+      const apiCat = catMap[category] || "general";
+      url += `&category=${apiCat}`;
+    }
+
     try {
       let data;
       const resp = await fetch(url);
+      if (!resp.ok) {
+        throw new Error(`API error (${resp.status}): ${resp.statusText}`);
+      }
       data = await resp.json();
-      // Map to internal article format:
-      const mapped = (data.data ?? []).map((item, idx) => ({
-        id: (item?.id || item?.url || idx + "-" + (item?.title||"")),
+      if (data.status !== "ok") {
+        throw new Error(data.message || "Unknown NewsAPI error");
+      }
+      // Map NewsAPI "articles" -> internal format
+      const mapped = (data.articles ?? []).map((item, idx) => ({
+        id: item.url || idx + "-" + (item.title || ""),
         title: item.title,
-        image: item.imageUrl,
-        category: capitalize(item.category || "General"),
-        summary: item.content || "",
+        image: item.urlToImage || "https://placehold.co/600x360/23272f/fff?text=No+Image",
+        category: category || "General",
+        summary: item.description || "",
         content: item.content || "",
-        source: item.source || "Unknown",
-        publishedAt: item.date ? formatDate(item.date) : "",
-        isBookmarked: bookmarks.some(b => b.title === item.title) // by title match
+        source: item.source?.name || "Unknown",
+        publishedAt: item.publishedAt ? formatDate(item.publishedAt) : "",
+        isBookmarked: bookmarks.some(b => b.title === item.title), // by title match
+        url: item.url
       }));
       setArticles(mapped);
+      if (mapped.length === 0) {
+        setError("No articles found for this category.");
+      }
     } catch (e) {
       // fallback demo data if no API
+      setError(
+        "Could not fetch news from NewsAPI.org. Showing demo articles. " +
+          (e?.message ? `(${e.message})` : "")
+      );
       const demo = [
         {
           id: 1,
           title: "Tech Giants Merge to Form New Era in AI", image: "https://images.unsplash.com/photo-1461749280684-dccba630e2f6?fit=crop&w=600&q=80",
           category: "Technology", summary: "The world’s largest tech companies announced a merger that will have sweeping consequences for global AI.",
-          content: "Full article content here...", source: "TechCrunch", publishedAt: "2024-06-28", isBookmarked: false
+          content: "Full article content here...", source: "TechCrunch", publishedAt: "2024-06-28", isBookmarked: false,
+          url: "#"
         },
         {
           id: 2,
           title: "World Health Organization Announces Breakthrough", image: "https://images.unsplash.com/photo-1506744038136-46273834b3fb?fit=crop&w=600&q=80",
           category: "Health", summary: "A new medical breakthrough could change the future of healthcare.",
-          content: "Full article content here...", source: "BBC Health", publishedAt: "2024-06-28", isBookmarked: false
+          content: "Full article content here...", source: "BBC Health", publishedAt: "2024-06-28", isBookmarked: false,
+          url: "#"
         }
       ];
       setArticles(demo);
-      setNotification("Could not fetch news. Showing demo articles.");
     } finally {
       setLoading(false);
     }
   }
 
-  // Fetch data at app load or when onboarding is complete
+  // Fetch data at app load or when onboarding is complete or category changes
   useEffect(() => {
     if (onboarded) {
-      fetchArticles(preferences);
+      // Always fetch for current selected category
+      if (selectedCategory && selectedCategory !== "All") {
+        fetchArticles([selectedCategory]);
+      } else {
+        fetchArticles(preferences);
+      }
     }
     // eslint-disable-next-line
-  }, [onboarded]);
+  }, [onboarded, selectedCategory]); // refetch on onboarding or tab/cat change
 
   // ------------- Bookmarks Logic ---------------
   // PUBLIC_INTERFACE
