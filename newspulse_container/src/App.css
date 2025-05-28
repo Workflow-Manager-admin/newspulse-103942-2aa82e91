@@ -1,9 +1,51 @@
 :root {
+  --primary: #1E88E5;
+  --secondary: #FDD835;
+  --accent: #43A047;
   --kavia-orange: #E87A41;
   --kavia-dark: #1A1A1A;
-  --text-color: #ffffff;
-  --text-secondary: rgba(255, 255, 255, 0.7);
-  --border-color: rgba(255, 255, 255, 0.1);
+  --text-color: #fff;
+  --text-secondary: rgba(255,255,255,0.69);
+  --border-color: rgba(255,255,255,0.12);
+  --card-bg: #23272f;
+  --modal-bg: #181A1D;
+
+  /* Category Colors */
+  --tech-category: #1E88E5;
+  --politics-category: #43A047;
+  --health-category: #EA4959;
+  --sports-category: #FBB034;
+  --entertainment-category: #9C27B0;
+  --gray-category: #444e64;
+
+  background-color: #191c1f;
+}
+
+body {
+  margin: 0;
+  font-family: 'Inter', 'Roboto', 'Helvetica', 'Arial', sans-serif;
+  background-color: var(--kavia-dark);
+  color: var(--text-color);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Dark/Light theme toggles */
+body.dark, .app.dark {
+  --text-color: #fff;
+  --text-secondary: rgba(255,255,255,0.67);
+  --border-color: rgba(255,255,255,0.10);
+  --card-bg: #23272f;
+  --modal-bg: #181A1D;
+  background: #181a1d;
+}
+body.light, .app.light {
+  --text-color: #181A1D;
+  --text-secondary: #2c323b;
+  --border-color: rgba(30,30,30,0.08);
+  --card-bg: #fff;
+  --modal-bg: #f7fafc;
+  background: #f3f7fa;
 }
 
 body {
