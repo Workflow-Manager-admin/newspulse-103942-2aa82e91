@@ -37,6 +37,17 @@ function AppContent() {
   const [customSummary, setCustomSummary] = useState('');
   const [summarizing, setSummarizing] = useState(false);
 
+  // Push notification modal, simulation logic & prefs (simulate, no actual push in this demo)
+  const [notifModalOpen, setNotifModalOpen] = useState(false);
+  const [notifPrefs, setNotifPrefs] = useState(() => {
+    // Try to retrieve from localStorage
+    try {
+      return JSON.parse(window.localStorage.getItem('np-notif-prefs') || "{}");
+    } catch {
+      return {};
+    }
+  });
+
   // Handlers
   const handleOpenArticle = (article) => setModalArticle(article);
   const handleCloseModal = () => setModalArticle(null);
@@ -47,7 +58,27 @@ function AppContent() {
   };
   const handleToggleBookmarks = () => setBookmarksOpen(b => !b);
 
-  // PUBLIC_INTERFACE
+  // Toggle notification category
+  const handleNotifPrefChange = (cat) => {
+    setNotifPrefs(prev => {
+      const updated = { ...prev };
+      if (cat === "breaking") {
+        updated.breaking = !prev.breaking;
+      } else {
+        updated[cat] = !prev[cat];
+      }
+      window.localStorage.setItem("np-notif-prefs", JSON.stringify(updated));
+      return updated;
+    });
+  };
+
+  // Simulate "request" for push notification permissions
+  const handleRequestPushPermission = () => {
+    // Simulate prompt/permission granted
+    setNotification("Push notifications enabled! (simulation)");
+    setNotifModalOpen(false);
+  };
+
   // Simulate AI summarization for user input, or would call API
   const handleCustomSummarize = () => {
     setSummarizing(true);
@@ -65,6 +96,34 @@ function AppContent() {
       <Navbar
         openBookmarks={handleToggleBookmarks}
         ThemeToggle={<ThemeToggle theme={theme} onToggle={toggleTheme} />}
+      />
+      <button
+        className="btn"
+        style={{
+          position: "fixed",
+          bottom: 34,
+          right: 24,
+          zIndex: 1100,
+          borderRadius: "50%",
+          boxShadow: "0 1.5px 8px 0 #1117",
+          width: 56,
+          height: 56,
+          background: "var(--accent)"
+        }}
+        aria-label="Notification Preferences"
+        title="Notification Preferences"
+        onClick={() => setNotifModalOpen(true)}
+      >
+        <span style={{fontSize: "1.36rem"}} role="img" aria-label="bell">🔔</span>
+      </button>
+      <NotificationSettingsModal
+        open={notifModalOpen}
+        onClose={() => setNotifModalOpen(false)}
+        categories={categories}
+        preferences={preferences}
+        notifPrefs={notifPrefs}
+        onChange={handleNotifPrefChange}
+        onRequestPermission={handleRequestPushPermission}
       />
       <main>
         <div className="container" style={{ paddingTop: 96 }}>
